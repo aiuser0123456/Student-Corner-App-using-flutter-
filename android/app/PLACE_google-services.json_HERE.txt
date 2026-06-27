@@ -1,0 +1,10 @@
+You must place your real `google-services.json` (from Firebase Console ->
+Project settings -> Your apps -> Android app) in this folder:
+
+  android/app/google-services.json
+
+Running `flutterfire configure` from the project root will normally do this
+for you automatically. Without this file, Android builds will fail.
+
+This file is intentionally NOT included in the zip because it contains
+project-specific secrets tied to YOUR Firebase project.

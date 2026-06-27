@@ -1,0 +1,49 @@
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Rules for resources collection
+    match /resources/{resourceId} {
+      // Allow anyone to read the list of resources and individual resources
+      allow read: if true;
+      // Only authenticated admins can create, update, or delete resources
+      allow write: if request.auth != null && request.auth.token.isAdmin == true;
+    }
+
+    // Rules for user profiles
+    match /users/{userId} {
+      // Allow a user to create their own profile document
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // Allow a user to read their own document
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Allow a user to update their own document, but not change their admin status
+      allow update: if request.auth != null && request.auth.uid == userId && request.resource.data.isAdmin == resource.data.isAdmin;
+      // Disallow deletion of user documents
+      allow delete: if false;
+    }
+
+    // Rules for ensuring unique usernames
+    match /usernames/{username} {
+      // Allow anyone to check if a username exists
+      allow get: if true;
+      // Allow a user to claim a username if they are creating their own user document
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.uid;
+       // Disallow updates to username documents to prevent takeovers
+      allow update: if false;
+      // Allow a user to delete their own username document
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
+
+    // Rules for AI Chat Commands
+    match /chatCommands/{commandId} {
+      // Allow any client to read the commands to use in the chat UI
+      allow read: if true;
+      // Only authenticated admins can create, update, or delete commands
+      allow write: if request.auth != null && request.auth.token.isAdmin == true;
+    }
+  }
+}
+
+    
